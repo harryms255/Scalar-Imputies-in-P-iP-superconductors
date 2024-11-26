@@ -260,7 +260,17 @@ def analytic_ingap_band(kx,t,mu,Delta,V,x0=0):
     p_pole=fsolve(det_T,x0=x0,full_output=True)
     h_pole=fsolve(det_T,x0=-x0,full_output=True)
     
-    return p_pole[0][0],h_pole[0][0]
+    p_pole_ret,h_pole_ret=p_pole[0][0],h_pole[0][0]
+    
+    #This determines if the solution is good or not
+    #This is generally true when the in-gap band is not seperated from the bulk
+    #If it is bad, the intial guess is simply returned
+    if abs(p_pole[1]["fvec"])>10**(-5):
+        p_pole_ret=x0
+    if abs(h_pole[1]["fvec"])>10**(-5):
+        h_pole_ret=-x0
+    
+    return p_pole_ret,h_pole_ret
 
 #Numeric Ingap Bands----------------------------------------------------------
 
@@ -286,7 +296,17 @@ def numeric_ingap_band(kx,t,mu,Delta,V,x0=0):
     p_pole=fsolve(det_T,x0=x0,full_output=True)
     h_pole=fsolve(det_T,x0=-x0,full_output=True)
     
-    return p_pole[0][0],h_pole[0][0]
+    p_pole_ret,h_pole_ret=p_pole[0][0],h_pole[0][0]
+    
+    #This determines if the solution is good or not
+    #This is generally true when the in-gap band is not seperated from the bulk
+    #If it is bad, the intial guess is simply returned
+    if abs(p_pole[1]["fvec"])>10**(-5):
+        p_pole_ret=x0
+    if abs(h_pole[1]["fvec"])>10**(-5):
+        h_pole_ret=-x0
+    
+    return p_pole_ret,h_pole_ret
 
 #Electronic Structure----------------------------------------------------------
 
