@@ -17,13 +17,12 @@ from scipy.optimize import fsolve
 import pfapack.pfaffian as pf
 
 plt.close("all")
-plt.close("all")
 plt.rc('font', family='serif')
 plt.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}\usepackage{amssymb}'
 plt.rc('text', usetex=True)
 plt.rcParams.update({'font.size': 30})
 
-#bulk_model--------------------------------------------------------------------
+#bulk substrate model--------------------------------------------------------------------
 def p_ip(kx,ky,t,mu,Delta):
     H=np.array(([-2*t*np.cos(kx)-2*t*np.cos(ky)-mu,Delta*(np.sin(kx)-1j*np.sin(ky))],[Delta*(np.sin(kx)+1j*np.sin(ky)),mu+2*t*(np.cos(kx)+np.cos(ky))]))
     return H
@@ -157,7 +156,7 @@ def numeric_bulk_GF(omega,kx,ky,t,mu,Delta):
     return G
 
 def numeric_GF(omega,kx,y,t,mu,Delta):
-    ky_values=np.linspace(-np.pi,np.pi,10001)
+    ky_values=np.linspace(-np.pi,np.pi,1001)
     dk=ky_values[1]-ky_values[0]
     GF=np.zeros((2,2),dtype=complex)
     
@@ -206,11 +205,12 @@ def coeff_a2(kx,mu):
     return -2*(mu+2*np.cos(kx))
 
 def coeff_a3(omega,kx,mu,Delta):
-    return omega**2-2-(mu+2*np.cos(kx))**2-Delta**2*np.sin(kx)**2-Delta**2/2
+    eta=0.00001j
+    return (omega+eta)**2-2-(mu+2*np.cos(kx))**2-Delta**2*np.sin(kx)**2-Delta**2/2
 
 def poles(omega,kx,mu,Delta,pm1,pm2):
     
-    omega+=0.00001j
+
     a=coeff_a1(Delta)
     b=coeff_a2(kx, mu)
     c=coeff_a3(omega, kx, mu, Delta)
@@ -238,7 +238,55 @@ def analytic_GF(omega,kx,t,mu,Delta):
 
 #Analytic Ingap Bands----------------------------------------------------------
 
+def pole_condition(omega,kx,t,mu,Delta,V):
+    g=analytic_GF(omega, kx, t, mu, Delta)
+    
+    if V==0:
+        T=10**6*np.array(([1,0],[0,-1]))
+    else:
+        T=1/V*np.array(([1,0],[0,-1]))-g
+        
+    pole_condition=np.linalg.det(T)
+    
+    pole_condition_return=abs(pole_condition)**2
+    return pole_condition_return
 
+def analytic_ingap_band(kx,t,mu,Delta,V,x0=0):
+    
+    det_T=lambda omega:pole_condition(omega, kx, t, mu, Delta, V)
+    if x0==0:
+        x0=0.99*gap(kx, t, mu, Delta)
+    
+    p_pole=fsolve(det_T,x0=x0,full_output=True)
+    h_pole=fsolve(det_T,x0=-x0,full_output=True)
+    
+    return p_pole[0][0],h_pole[0][0]
+
+#Numeric Ingap Bands----------------------------------------------------------
+
+def numeric_pole_condition(omega,kx,t,mu,Delta,V):
+    g=numeric_GF(omega, kx,0, t, mu, Delta)
+    
+    if V==0:
+        T=10**6*np.array(([1,0],[0,-1]))
+    else:
+        T=1/V*np.array(([1,0],[0,-1]))-g
+        
+    pole_condition=np.linalg.det(T)
+    
+    pole_condition_return=abs(pole_condition)**2
+    return pole_condition_return
+
+def numeric_ingap_band(kx,t,mu,Delta,V,x0=0):
+    
+    det_T=lambda omega:numeric_pole_condition(omega, kx, t, mu, Delta, V)
+    if x0==0:
+        x0=0.99*gap(kx, t, mu, Delta)
+    
+    p_pole=fsolve(det_T,x0=x0,full_output=True)
+    h_pole=fsolve(det_T,x0=-x0,full_output=True)
+    
+    return p_pole[0][0],h_pole[0][0]
 
 #Electronic Structure----------------------------------------------------------
 
@@ -258,7 +306,7 @@ def gap(kx,t,mu,Delta):
     gap_values=np.append(gap_values,[(2*t+mu_kx)**2+Delta_x**2,(-2*t+mu_kx)**2+Delta_x**2])
     
     cos_ky=mu_kx*t/(Delta**2-2*t**2)
-    if abs(cos_ky)<1:
+    if abs(cos_ky).any()<1:
         gap_values=np.append(gap_values,(2*t*cos_ky+mu_kx)**2+Delta_x**2+Delta**2*(1-cos_ky**2))
     gap_value=np.sqrt(np.min(gap_values))
 
