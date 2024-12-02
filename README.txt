@@ -7,5 +7,5 @@ The following non-standard modules will need to be installed
 Qsymm (for symmetry analysis)
     Can be installed using 'conda install conda-forge::qsymm' or 'pip install qsymm'
 
-Pfapack (for efficient calculation of pfaffians_
+Pfapack (for efficient calculation of pfaffians)
     Can be installed using 'conda install pfapack' or 'pip install pfapack'
