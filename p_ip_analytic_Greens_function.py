@@ -16,7 +16,7 @@ analytic_spectrum=np.zeros((2,len(kx_values)),dtype=float)
 numeric_spectrum=np.zeros((2,len(kx_values)),dtype=float)
 
 for kx_indx,kx in enumerate(tqdm(kx_values)):
-    analytic_spectrum[:,kx_indx]=np.linalg.eigvalsh(analytic_GF(omega, kx, t, mu, Delta))
+    analytic_spectrum[:,kx_indx]=np.linalg.eigvalsh(analytic_GF(omega, kx,0, t, mu, Delta))
     numeric_spectrum[:,kx_indx]=np.linalg.eigvalsh(numeric_GF(omega, kx, 0, t, mu, Delta))
     
 plt.figure()

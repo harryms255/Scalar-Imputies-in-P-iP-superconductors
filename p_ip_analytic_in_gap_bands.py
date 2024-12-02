@@ -10,9 +10,9 @@ from p_ip_functions_file import *
 Ny=101
 t=1
 mu_values=np.linspace(-5,5,51)
-#mu_values=[-4]
+mu_values=[-3.5]
 Delta=0.1
-V=-3
+V=-1
 kx_values=np.linspace(-np.pi,np.pi,101)
 numeric_spectrum=np.zeros((2*Ny,len(kx_values)))
 analytic_spectrum=np.zeros((2,len(kx_values)))
@@ -29,10 +29,11 @@ for mu in tqdm(mu_values):
         
 #        gap_values[kx_indx]=gap(kx, t, mu, Delta)
     for i in range(2*Ny):
-        ax.plot(kx_values/np.pi,numeric_spectrum[i,:],"k")
-    
+        ax.plot(kx_values/np.pi,numeric_spectrum[i,:],"k-")
     for i in range(2):
-        ax.plot(kx_values/np.pi,analytic_spectrum[i,:],"r--",linewidth=4)
+        ax.plot(kx_values/np.pi,analytic_spectrum[i,:],"b.",linewidth=4)
+    
+    
     #ax.plot(kx_values,gap_values,"g")
     
     ax.set_xlabel(r"$k_x/\pi$")

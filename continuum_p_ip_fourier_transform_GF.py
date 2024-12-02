@@ -49,6 +49,11 @@ def interface_GF(omega,kx,y1,y2,mu,Delta,V):
     G=g_12+g_1@T@g_2
     
     return G
+
+def phase_boundary(mu,Delta):
+    g=mixed_GF(0, 0, 0, mu, Delta)
+    
+    return np.real(1/g[0,0])
     
 
 mu_values=np.linspace(-2,2,21)
@@ -58,12 +63,19 @@ omega=0
 kx_values=np.linspace(-np.pi,np.pi,101)
 ky_values=np.linspace(-np.pi,np.pi,101)
 
-spectrum=np.zeros((len(kx_values),2))
-for mu in mu_values:
-    plt.figure(r"$\mu={:.2f}$".format(mu))
-    for kx_indx,kx in enumerate(tqdm(kx_values)):
-        spectrum[kx_indx,:]=np.linalg.eigvalsh(mixed_GF(omega,kx,y,mu,Delta))
+# spectrum=np.zeros((len(kx_values),2))
+# for mu in mu_values:
+#     plt.figure(r"$\mu={:.2f}$".format(mu))
+#     for kx_indx,kx in enumerate(tqdm(kx_values)):
+#         spectrum[kx_indx,:]=np.linalg.eigvalsh(mixed_GF(omega,kx,y,mu,Delta))
         
-    for i in range(2):
-        plt.plot(kx_values,spectrum[:,i],"k")
+#     for i in range(2):
+#         plt.plot(kx_values,spectrum[:,i],"k")
+plt.figure()
+mu_values=np.linspace(-5,5,101)
+phase_boundaries_values=np.zeros(len(mu_values))
+for mu_indx,mu in enumerate(tqdm(mu_values)):
+    phase_boundaries_values[mu_indx]=phase_boundary(mu, Delta)
+    
+plt.plot(mu_values,phase_boundaries_values)
         
